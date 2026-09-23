@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Admin Dashboard</title>
+	<style>
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+			font-family: Arial, sans-serif;
+		}
+
+		body {
+			background: #eef5fb;
+			color: #17243b;
+		}
+
+		.dashboard {
+			display: flex;
+			min-height: 100vh;
+		}
+
+		.sidebar {
+			width: 220px;
+			background: #101d31;
+			color: white;
+			padding: 25px 15px;
+		}
+
+		.sidebar h2 {
+			margin-bottom: 30px;
+		}
+
+		.sidebar a {
+			display: block;
+			color: #cbd5e1;
+			text-decoration: none;
+			padding: 12px;
+			margin: 8px 0;
+			border-radius: 6px;
+		}
+
+		.sidebar a:first-of-type,
+		.sidebar a:hover {
+			background: #2468d8;
+			color: white;
+		}
+
+		.main {
+			flex: 1;
+			padding: 25px;
+		}
+
+		.topbar {
+			display: flex;
+			justify-content: space-between;
+			margin-bottom: 25px;
+		}
+
+		.search {
+			padding: 10px;
+			border: 1px solid #d6e0eb;
+			border-radius: 5px;
+		}
+
+		.cards,
+		.content {
+			display: flex;
+			gap: 15px;
+			flex-wrap: wrap;
+			margin-top: 15px;
+		}
+
+		.card,
+		.panel {
+			flex: 1;
+			min-width: 180px;
+			background: white;
+			padding: 18px;
+			border: 1px solid #e0e8f0;
+			border-radius: 8px;
+		}
+
+		.card h3,
+		.panel h3 {
+			color: #637895;
+			font-size: 14px;
+			margin-bottom: 12px;
+		}
+
+		.card p {
+			font-size: 22px;
+			font-weight: bold;
+			margin-bottom: 8px;
+		}
+
+		.green { color: #13a568; }
+		.blue { color: #2468d8; }
+		.orange { color: #e98613; }
+
+		.big-panel {
+			flex: 2;
+			min-width: 300px;
+		}
+
+		.chart {
+			height: 150px;
+			display: flex;
+			align-items: end;
+			gap: 12px;
+			padding-top: 20px;
+		}
+
+		.bar {
+			flex: 1;
+			background: #2468d8;
+			border-radius: 4px 4px 0 0;
+		}
+
+		.panel li {
+			list-style: none;
+			padding: 10px 0;
+			border-bottom: 1px solid #edf1f5;
+		}
+
+		@media (max-width: 700px) {
+			.dashboard { display: block; }
+			.sidebar { width: 100%; }
+			.sidebar a { display: inline-block; }
+			.main { padding: 15px; }
+			.topbar { display: block; }
+			.search { width: 100%; margin-top: 15px; }
+		}
+	</style>
+</head>
+<body>
+	<div class="dashboard">
+		<aside class="sidebar">
+			<h2>◉ AdminPro</h2>
+			<a href="#">⌂ Dashboard</a>
+			<a href="#">⌁ Analytics</a>
+			<a href="#">♙ Users</a>
+			<a href="#">▣ Orders</a>
+			<a href="#">□ Products</a>
+			<a href="#">⚙ Settings</a>
+		</aside>
+
+		<main class="main">
+			<div class="topbar">
+				<h1>Dashboard</h1>
+				<input class="search" type="text" placeholder="Search...">
+			</div>
+
+			<section class="cards">
+				<div class="card">
+					<h3 class="green">Total Revenue</h3>
+					<p>₹1,24,532</p>
+					<small class="green">↑ 12% from last month</small>
+				</div>
+				<div class="card">
+					<h3 class="blue">Total Orders</h3>
+					<p>892</p>
+					<small class="green">↑ 8% from last month</small>
+				</div>
+				<div class="card">
+					<h3 class="blue">Active Users</h3>
+					<p>3,521</p>
+					<small class="green">↑ 15% from last month</small>
+				</div>
+				<div class="card">
+					<h3 class="orange">Conversion Rate</h3>
+					<p>4.2%</p>
+					<small class="green">↑ 2% from last month</small>
+				</div>
+			</section>
+
+			<section class="content">
+				<div class="panel big-panel">
+					<h3>Revenue Overview</h3>
+					<h2>₹1,24,532</h2>
+					<div class="chart">
+						<div class="bar" style="height: 30%"></div>
+						<div class="bar" style="height: 45%"></div>
+						<div class="bar" style="height: 38%"></div>
+						<div class="bar" style="height: 62%"></div>
+						<div class="bar" style="height: 55%"></div>
+						<div class="bar" style="height: 85%"></div>
+					</div>
+				</div>
+
+				<div class="panel">
+					<h3>Recent Orders</h3>
+					<ul>
+						<li>Rahul Sharma - ₹2,499</li>
+						<li>Priya Singh - ₹4,099</li>
+						<li>Amit Kumar - ₹1,299</li>
+						<li>Neha Gupta - ₹3,799</li>
+					</ul>
+				</div>
+
+				<div class="panel">
+					<h3>Traffic Overview</h3>
+					<h2>8,432</h2>
+					<small>Total Visitors</small>
+				</div>
+
+				<div class="panel">
+					<h3>Top Products</h3>
+					<ul>
+						<li>Laptop Pro - 2,450</li>
+						<li>Wireless Earbuds - 1,892</li>
+						<li>Smart Watch - 1,203</li>
+						<li>Backpack - 982</li>
+					</ul>
+				</div>
+			</section>
+		</main>
+	</div>
+</body>
+</html>
