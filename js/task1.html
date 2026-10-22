@@ -1,0 +1,786 @@
+/*Week 1- task 1
+JS quiz Arena-a Quiz app
+expexted outcomes:
+  1.Show one question at a time with clickable options,a progress line("Q3/25"),and a live score.
+  2.After a click, turn the chosen option green or red, reveal the correct one , show the explanation.
+  3.Include Next and restart buttons. At the end,show the final score and a rating message.
+  4.Add a 30-second countdown per question. When it hits 0, auto-lock the question and reveal the answer.
+  5.Add a"Review wrong answers screen at the end.*/
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Quiz Arena</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #eef2ff;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 30px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px #00000015;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4f46e5;
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .progress-bg {
+            width: 100%;
+            height: 10px;
+            background: #ddd;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        #progress {
+            height: 10px;
+            width: 0%;
+            background: #4f46e5;
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+
+        #timer {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        #question {
+            font-size: 21px;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 14px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .option:hover:not(:disabled) {
+            background: #eef2ff;
+            border-color: #4f46e5;
+        }
+
+        .correct {
+            background: #bbf7d0;
+            border-color: #16a34a;
+        }
+
+        .wrong {
+            background: #fecaca;
+            border-color: #dc2626;
+        }
+
+        #explanation {
+            margin-top: 15px;
+            padding: 12px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .main-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #4f46e5;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .main-btn:hover {
+            background: #3730a3;
+        }
+
+        #restartBtn {
+            background: #64748b;
+        }
+
+        #restartBtn:hover {
+            background: #475569;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #result {
+            text-align: center;
+        }
+
+        #result h2 {
+            color: #4f46e5;
+        }
+
+        .review-item {
+            background: #f9fafb;
+            padding: 15px;
+            margin: 12px 0;
+            border-left: 4px solid #dc2626;
+            border-radius: 6px;
+            line-height: 1.6;
+        }
+
+        .review-correct {
+            border-left-color: #16a34a;
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 16px;
+                margin: 10px auto;
+            }
+
+            #question {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>⚡ JS Quiz Arena</h1>
+
+        <!-- Quiz screen -->
+        <div id="quizScreen">
+
+            <div class="top">
+                <span id="questionNumber">Q1/25</span>
+                <span id="score">Score: 0</span>
+                <span id="timer">Time: 30s</span>
+            </div>
+
+            <div class="progress-bg">
+                <div id="progress"></div>
+            </div>
+
+            <h2 id="question">Question appears here</h2>
+
+            <div id="options"></div>
+
+            <div id="explanation" class="hidden"></div>
+
+            <div class="buttons">
+                <button id="nextBtn" class="main-btn hidden">
+                    Next Question →
+                </button>
+
+                <button id="restartBtn" class="main-btn">
+                    Restart ↻
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Result screen -->
+        <div id="result" class="hidden">
+
+            <h2>🏆 Quiz Completed!</h2>
+
+            <h3 id="finalScore"></h3>
+
+            <p id="rating"></p>
+
+            <button id="reviewBtn" class="main-btn">
+                Review Wrong Answers
+            </button>
+
+            <button id="playAgainBtn" class="main-btn">
+                Play Again ↻
+            </button>
+
+        </div>
+
+        <div id="reviewScreen" class="hidden">
+
+            <h2>📝 Review Your Answers</h2>
+
+            <div id="reviewList"></div>
+
+            <div class="buttons">
+                <button id="backBtn" class="main-btn">
+                    Back to Results
+                </button>
+
+                <button id="reviewRestartBtn" class="main-btn">
+                    Restart Quiz ↻
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        const questions = [
+            {
+                question: "1. Which keyword is used to declare a variable in JavaScript?",
+                options: ["int", "var", "string", "float"],
+                answer: 1,
+                explanation: "var is a JavaScript keyword used to declare variables. We can also use let and const."
+            },
+            {
+                question: "2. Which symbol is used for single-line comments in JavaScript?",
+                options: ["<!-- -->", "#", "//", "**"],
+                answer: 2,
+                explanation: "// is used to write a single-line comment in JavaScript."
+            },
+            {
+                question: "3. Which method adds an element to the end of an array?",
+                options: ["push()", "pop()", "shift()", "slice()"],
+                answer: 0,
+                explanation: "push() adds one or more elements to the end of an array."
+            },
+            {
+                question: "4. Which keyword creates a block-scoped variable?",
+                options: ["int", "let", "define", "dim"],
+                answer: 1,
+                explanation: "let creates a block-scoped variable in JavaScript."
+            },
+            {
+                question: "5. Which method prints output in the browser console?",
+                options: ["print()", "echo()", "console.log()", "display()"],
+                answer: 2,
+                explanation: "console.log() displays messages and values in the browser console."
+            },
+            {
+                question: "6. Which operator checks both value and data type?",
+                options: ["=", "==", "===", "!="],
+                answer: 2,
+                explanation: "The === operator compares both value and data type."
+            },
+            {
+                question: "7. Which data type represents true or false?",
+                options: ["String", "Boolean", "Number", "Object"],
+                answer: 1,
+                explanation: "Boolean represents either true or false."
+            },
+            {
+                question: "8. Which method removes the last element of an array?",
+                options: ["push()", "shift()", "pop()", "unshift()"],
+                answer: 2,
+                explanation: "pop() removes and returns the last element of an array."
+            },
+            {
+                question: "9. Which keyword declares a constant?",
+                options: ["const", "var", "let", "static"],
+                answer: 0,
+                explanation: "const declares a variable that cannot be reassigned."
+            },
+            {
+                question: "10. Which function converts JSON text into a JavaScript object?",
+                options: ["JSON.stringify()", "JSON.parse()", "JSON.convert()", "JSON.object()"],
+                answer: 1,
+                explanation: "JSON.parse() converts valid JSON text into a JavaScript value."
+            },
+            {
+                question: "11. Which loop runs while a condition is true?",
+                options: ["if", "switch", "while", "break"],
+                answer: 2,
+                explanation: "A while loop repeats as long as its condition is true."
+            },
+            {
+                question: "12. Which method converts a string to uppercase?",
+                options: ["toUpperCase()", "upper()", "capitalize()", "toCaps()"],
+                answer: 0,
+                explanation: "toUpperCase() returns a new string with uppercase letters."
+            },
+            {
+                question: "13. Which operator is used for logical AND?",
+                options: ["||", "&&", "!", "&"],
+                answer: 1,
+                explanation: "The && operator returns a truthy or falsy result based on both conditions."
+            },
+            {
+                question: "14. Which method selects an element by its ID?",
+                options: ["getElementById()", "getElementsByClass()", "queryAll()", "selectId()"],
+                answer: 0,
+                explanation: "document.getElementById() selects an element using its unique ID."
+            },
+            {
+                question: "15. What does typeof 10 return?",
+                options: ["integer", "float", "number", "digit"],
+                answer: 2,
+                explanation: "typeof 10 returns the string 'number'. JavaScript uses one Number type for ordinary numeric values."
+            },
+            {
+                question: "16. Which method adds an element to the beginning of an array?",
+                options: ["push()", "unshift()", "pop()", "slice()"],
+                answer: 1,
+                explanation: "unshift() adds one or more elements to the beginning of an array."
+            },
+            {
+                question: "17. Which statement stops a loop immediately?",
+                options: ["continue", "skip", "break", "return"],
+                answer: 2,
+                explanation: "break immediately exits the nearest loop or switch statement."
+            },
+            {
+                question: "18. Which brackets are used to create an array?",
+                options: ["{}", "()", "[]", "<>"],
+                answer: 2,
+                explanation: "Square brackets [] are used to create an array."
+            },
+            {
+                question: "19. Which method converts an object into JSON text?",
+                options: ["JSON.parse()", "JSON.stringify()", "JSON.toObject()", "JSON.text()"],
+                answer: 1,
+                explanation: "JSON.stringify() converts a JavaScript value into JSON text when possible."
+            },
+            {
+                question: "20. Which event occurs when a user clicks an element?",
+                options: ["hover", "change", "click", "submit"],
+                answer: 2,
+                explanation: "The click event occurs when the user clicks an element."
+            },
+            {
+                question: "21. Which keyword is used to define a function?",
+                options: ["function", "method", "define", "fun"],
+                answer: 0,
+                explanation: "The function keyword can be used to declare a function."
+            },
+            {
+                question: "22. What is the index of the first array element?",
+                options: ["1", "-1", "0", "Depends on the array"],
+                answer: 2,
+                explanation: "JavaScript arrays use zero-based indexing, so the first element is at index 0."
+            },
+            {
+                question: "23. Which method creates a new array by transforming each element?",
+                options: ["forEach()", "map()", "pop()", "findIndex()"],
+                answer: 1,
+                explanation: "map() creates a new array containing the results of applying a function to each element."
+            },
+            {
+                question: "24. Which statement is used to make decisions?",
+                options: ["if", "loop", "array", "console"],
+                answer: 0,
+                explanation: "An if statement executes code when its condition is true."
+            },
+            {
+                question: "25. Which HTML element is used to include JavaScript?",
+                options: ["<css>", "<javascript>", "<script>", "<code>"],
+                answer: 2,
+                explanation: "The <script> element is used to include or write JavaScript in HTML."
+            }
+        ];
+
+
+        let currentQuestion = 0;
+        let score = 0;
+        let timeLeft = 30;
+        let timer;
+        let answered = false;
+
+        let userAnswers = [];
+
+
+        const questionNumber = document.getElementById("questionNumber");
+        const scoreElement = document.getElementById("score");
+        const timerElement = document.getElementById("timer");
+        const progress = document.getElementById("progress");
+        const questionElement = document.getElementById("question");
+        const optionsElement = document.getElementById("options");
+        const explanationElement = document.getElementById("explanation");
+
+        const quizScreen = document.getElementById("quizScreen");
+        const resultScreen = document.getElementById("result");
+        const reviewScreen = document.getElementById("reviewScreen");
+
+        const nextBtn = document.getElementById("nextBtn");
+        const restartBtn = document.getElementById("restartBtn");
+
+        // Display the current question.
+
+        function showQuestion() {
+
+            // Stop the previous timer.
+            clearInterval(timer);
+
+            answered = false;
+            timeLeft = 30;
+
+            const q = questions[currentQuestion];
+
+            questionNumber.textContent =
+                "Q" + (currentQuestion + 1) + "/" + questions.length;
+
+            scoreElement.textContent = "Score: " + score;
+
+            timerElement.textContent = "Time: " + timeLeft + "s";
+
+            progress.style.width =
+                ((currentQuestion + 1) / questions.length) * 100 + "%";
+
+            questionElement.textContent = q.question;
+
+            optionsElement.innerHTML = "";
+
+            explanationElement.classList.add("hidden");
+
+            nextBtn.classList.add("hidden");
+
+            // Create a button for every option.
+
+            for (let i = 0; i < q.options.length; i++) {
+
+                const button = document.createElement("button");
+
+                button.textContent = q.options[i];
+
+                button.className = "option";
+
+                // When clicked, check the selected answer.
+                button.addEventListener("click", function () {
+                    checkAnswer(i);
+                });
+
+                optionsElement.appendChild(button);
+            }
+
+            // Start the 30-second countdown.
+
+            timer = setInterval(function () {
+
+                timeLeft--;
+
+                timerElement.textContent = "Time: " + timeLeft + "s";
+
+                if (timeLeft <= 0) {
+
+                    clearInterval(timer);
+
+                    // Automatically reveal the answer.
+                    checkAnswer(-1);
+                }
+
+            }, 1000);
+        }
+
+        // Check whether the selected answer is correct.
+        // -1 means the timer ran out.
+
+        function checkAnswer(selectedIndex) {
+
+            // Prevent answering more than once.
+            if (answered) {
+                return;
+            }
+
+            answered = true;
+
+            clearInterval(timer);
+
+            const q = questions[currentQuestion];
+
+            const optionButtons =
+                document.querySelectorAll(".option");
+
+            // Save the user's answer.
+
+            userAnswers[currentQuestion] = selectedIndex;
+
+            // Check the answer.
+
+            if (selectedIndex === q.answer) {
+
+                score++;
+
+            }
+
+            // Show green for the correct answer and red for
+            // the selected wrong answer.
+
+            for (let i = 0; i < optionButtons.length; i++) {
+
+                optionButtons[i].disabled = true;
+
+                if (i === q.answer) {
+
+                    optionButtons[i].classList.add("correct");
+
+                } else if (i === selectedIndex) {
+
+                    optionButtons[i].classList.add("wrong");
+
+                }
+            }
+
+            // Update the live score.
+
+            scoreElement.textContent = "Score: " + score;
+
+            // Display the explanation.
+
+            if (selectedIndex === -1) {
+
+                explanationElement.textContent =
+                    "⏰ Time is up! The correct answer is: " +
+                    q.options[q.answer] + ". " + q.explanation;
+
+            } else if (selectedIndex === q.answer) {
+
+                explanationElement.textContent =
+                    "✅ Correct! " + q.explanation;
+
+            } else {
+
+                explanationElement.textContent =
+                    "❌ Incorrect! The correct answer is: " +
+                    q.options[q.answer] + ". " + q.explanation;
+
+            }
+
+            explanationElement.classList.remove("hidden");
+
+            // Display the Next button.
+
+            nextBtn.classList.remove("hidden");
+
+            // Change the button text on the last question.
+
+            if (currentQuestion === questions.length - 1) {
+
+                nextBtn.textContent = "See Final Result 🏆";
+
+            }
+        }
+
+        // Move to the next question.
+
+        nextBtn.addEventListener("click", function () {
+
+            if (!answered) {
+                return;
+            }
+
+            currentQuestion++;
+
+            // If all questions are completed, show results.
+
+            if (currentQuestion >= questions.length) {
+
+                showResult();
+
+            } else {
+
+                showQuestion();
+
+            }
+
+        });
+
+        // Display the final score and rating.
+
+        function showResult() {
+
+            clearInterval(timer);
+
+            quizScreen.classList.add("hidden");
+
+            resultScreen.classList.remove("hidden");
+
+            reviewScreen.classList.add("hidden");
+
+            document.getElementById("finalScore").textContent =
+                "Your Score: " + score + "/" + questions.length;
+
+            const percentage = (score / questions.length) * 100;
+
+            let message;
+
+            if (percentage >= 90) {
+
+                message = "🌟 Excellent! You are a JavaScript champion!";
+
+            } else if (percentage >= 70) {
+
+                message = "👏 Great job! Keep practising!";
+
+            } else if (percentage >= 50) {
+
+                message = "👍 Good effort! You can improve further.";
+
+            } else {
+
+                message = "💪 Keep learning! Try again to improve your score.";
+
+            }
+
+            document.getElementById("rating").textContent = message;
+
+        }
+
+        // Display the questions answered incorrectly or left unanswered.
+
+        document.getElementById("reviewBtn").addEventListener("click", function () {
+
+            resultScreen.classList.add("hidden");
+
+            reviewScreen.classList.remove("hidden");
+
+            const reviewList = document.getElementById("reviewList");
+
+            reviewList.innerHTML = "";
+
+            let wrongCount = 0;
+
+            for (let i = 0; i < questions.length; i++) {
+
+                const q = questions[i];
+
+                const userAnswer = userAnswers[i];
+
+                // Only show incorrect or unanswered questions.
+
+                if (userAnswer !== q.answer) {
+
+                    wrongCount++;
+
+                    const item = document.createElement("div");
+
+                    item.className = "review-item";
+
+                    let yourAnswer;
+
+                    if (userAnswer === -1 || userAnswer === undefined) {
+
+                        yourAnswer = "Not answered (time ran out)";
+
+                    } else {
+
+                        yourAnswer = q.options[userAnswer];
+
+                    }
+
+                    item.innerHTML =
+                        "<strong>Q" + (i + 1) + ": " +
+                        q.question + "</strong><br>" +
+
+                        "Your answer: " + yourAnswer + "<br>" +
+
+                        "Correct answer: " + q.options[q.answer] + "<br>" +
+
+                        "Explanation: " + q.explanation;
+
+                    reviewList.appendChild(item);
+
+                }
+
+            }
+
+            // Display a message if every answer was correct.
+
+            if (wrongCount === 0) {
+
+                reviewList.innerHTML =
+                    "<p>🎉 Perfect! You answered every question correctly.</p>";
+
+            }
+
+        });
+
+        // Return from review to the result screen.
+
+        document.getElementById("backBtn").addEventListener("click", function () {
+
+            reviewScreen.classList.add("hidden");
+
+            resultScreen.classList.remove("hidden");
+
+        });
+
+        // Restart the quiz from the beginning.
+
+        function restartQuiz() {
+
+            clearInterval(timer);
+
+            currentQuestion = 0;
+            score = 0;
+            timeLeft = 30;
+            answered = false;
+
+            userAnswers = [];
+
+            quizScreen.classList.remove("hidden");
+
+            resultScreen.classList.add("hidden");
+
+            reviewScreen.classList.add("hidden");
+
+            nextBtn.textContent = "Next Question →";
+
+            showQuestion();
+
+        }
+
+        // Restart buttons.
+
+        restartBtn.addEventListener("click", restartQuiz);
+
+        document.getElementById("playAgainBtn")
+            .addEventListener("click", restartQuiz);
+
+        document.getElementById("reviewRestartBtn")
+            .addEventListener("click", restartQuiz);
+
+        // Start the quiz when the page opens.
+
+        showQuestion();
+
+    </script>
+
+</body>
+</html>
+
+
+
+
+
