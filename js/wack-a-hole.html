@@ -1,0 +1,54 @@
+<html>
+<body>
+<h2>Whack-a-Mole Game</h2>
+<p>Score: <span id="score">0</span></p>
+<p>Time: <span id="time">30</span></p>
+
+<div id="grid"></div>
+<script>
+let score = 0;
+let time = 30;
+let active = -1;
+
+for (let i = 0; i < 9; i++) {
+    let box = document.createElement("button");
+    box.innerHTML = "-";
+    box.dataset.id = i;
+    document.getElementById("grid").appendChild(box);
+}
+
+let boxes = document.querySelectorAll("#grid button");
+
+function move() {
+    boxes.forEach(box => box.innerHTML = "-");
+    active = Math.floor(Math.random() * 9);
+    boxes[active].innerHTML = "🐹";
+}
+
+document.getElementById("grid").addEventListener("click", function(e) {
+    if (Number(e.target.dataset.id) === active && time > 0) {
+        score++;
+        document.getElementById("score").innerHTML = score;
+        move();
+    }
+});
+
+let game = setInterval(move, 800);
+
+let timer = setInterval(function() {
+    time--;
+    document.getElementById("time").innerHTML = time;
+
+    if (time === 0) {
+        clearInterval(game);
+        clearInterval(timer);
+        boxes.forEach(box => box.innerHTML = "-");
+        alert("Game Over! Score: " + score);
+    }
+}, 1000);
+
+move();
+</script>
+
+</body>
+</html>
