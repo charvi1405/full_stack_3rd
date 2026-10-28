@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<html>
+<body>
+<h2>Catch the Falling Ball</h2>
+<p>Score: <span id="score">0</span></p>
+<p>Misses: <span id="miss">0</span>/3</p>
+
+<div id="game" style="width:300px;height:300px;border:1px solid black;position:relative;overflow:hidden;">
+    <div id="ball" style="position:absolute;top:0;left:100px;">⚽</div>
+    <div id="basket" style="position:absolute;top:270px;left:120px;">🧺</div>
+</div>
+
+<script>
+let ball = document.getElementById("ball");
+let basket = document.getElementById("basket");
+let score = 0, miss = 0;
+let x = 100, y = 0, bx = 120;
+let gameOver = false;
+
+document.addEventListener("keydown", function(e) {
+    if (e.key == "ArrowLeft" && bx > 0) bx -= 20;
+    if (e.key == "ArrowRight" && bx < 240) bx += 20;
+    basket.style.left = bx + "px";
+});
+
+function moveBall() {
+    if (gameOver) return;
+
+    y += 10;
+    ball.style.top = y + "px";
+
+    if (y >= 250) {
+        if (x >= bx - 20 && x <= bx + 30) {
+            score++;
+            document.getElementById("score").innerHTML = score;
+        } else {
+            miss++;
+            document.getElementById("miss").innerHTML = miss;
+        }
+
+        if (miss == 3) {
+            gameOver = true;
+            clearInterval(game);
+            alert("Game Over! Score: " + score);
+            return;
+        }
+
+        y = 0;
+        x = Math.floor(Math.random() * 250);
+        ball.style.left = x + "px";
+    }
+}
+
+let game = setInterval(moveBall, 100);
+
+</script>
+
+</body>
+</html>

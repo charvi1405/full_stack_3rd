@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Card Match</title>
+</head>
+<body>
+    <h1>Memory Card Match</h1>
+    <p>Find all 8 matching pairs. Click two cards at a time.</p>
+    <p id="status">Moves: 0</p>
+    <div id="gameBoard" aria-label="Memory card board"></div>
+    <p id="message"></p>
+    <button id="restartButton" type="button">Play Again</button>
+
+    <script>
+        const symbols = ["🍎", "🍌", "🍇", "🍊", "🍉", "🥝", "🍓", "🍍"];
+        const gameBoard = document.getElementById("gameBoard");
+        const status = document.getElementById("status");
+        const message = document.getElementById("message");
+        const restartButton = document.getElementById("restartButton");
+
+        let cards = [];
+        let firstCard = null;
+        let secondCard = null;
+        let moves = 0;
+        let matchedPairs = 0;
+        let isLocked = false;
+
+        function shuffle(array) {
+            for (let index = array.length - 1; index > 0; index--) {
+                const randomIndex = Math.floor(Math.random() * (index + 1));
+                [array[index], array[randomIndex]] = [array[randomIndex], array[index]];
+            }
+            return array;
+        }
+
+        function startGame() {
+            const shuffledSymbols = shuffle([...symbols, ...symbols]);
+
+            cards = shuffledSymbols.map((symbol, index) => ({
+                id: index,
+                symbol: symbol,
+                isFlipped: false,
+                isMatched: false
+            }));
+
+            firstCard = null;
+            secondCard = null;
+            moves = 0;
+            matchedPairs = 0;
+            isLocked = false;
+            message.textContent = "";
+            updateStatus();
+            renderBoard();
+        }
+
+        function renderBoard() {
+            const table = document.createElement("table");
+            const tableBody = document.createElement("tbody");
+
+            for (let row = 0; row < 4; row++) {
+                const tableRow = document.createElement("tr");
+
+                for (let column = 0; column < 4; column++) {
+                    const card = cards[row * 4 + column];
+                    const tableCell = document.createElement("td");
+                    const cardButton = document.createElement("button");
+
+                    cardButton.type = "button";
+                    cardButton.textContent = card.isFlipped || card.isMatched
+                        ? card.symbol
+                        : "?";
+                    cardButton.setAttribute(
+                        "aria-label",
+                        card.isFlipped || card.isMatched
+                            ? "Revealed card"
+                            : "Hidden card"
+                    );
+                    cardButton.disabled = card.isMatched || isLocked;
+                    cardButton.addEventListener("click", () => flipCard(card.id));
+
+                    tableCell.appendChild(cardButton);
+                    tableRow.appendChild(tableCell);
+                }
+
+                tableBody.appendChild(tableRow);
+            }
+
+            table.appendChild(tableBody);
+            gameBoard.replaceChildren(table);
+        }
+
+        function flipCard(cardId) {
+            if (isLocked) {
+                return;
+            }
+
+            const selectedCard = cards[cardId];
+
+            if (selectedCard.isFlipped || selectedCard.isMatched) {
+                return;
+            }
+
+            selectedCard.isFlipped = true;
+
+            if (!firstCard) {
+                firstCard = selectedCard;
+                renderBoard();
+                return;
+            }
+
+            secondCard = selectedCard;
+            moves++;
+            updateStatus();
+            renderBoard();
+            checkMatch();
+        }
+
+        function checkMatch() {
+            if (firstCard.symbol === secondCard.symbol) {
+                firstCard.isMatched = true;
+                secondCard.isMatched = true;
+                matchedPairs++;
+                firstCard = null;
+                secondCard = null;
+                renderBoard();
+
+                if (matchedPairs === symbols.length) {
+                    message.textContent = `You matched all pairs in ${moves} moves!`;
+                }
+                return;
+            }
+
+            isLocked = true;
+            setTimeout(() => {
+                firstCard.isFlipped = false;
+                secondCard.isFlipped = false;
+                firstCard = null;
+                secondCard = null;
+                isLocked = false;
+                renderBoard();
+            }, 1000);
+        }
+
+        function updateStatus() {
+            status.textContent = `Moves: ${moves} | Pairs found: ${matchedPairs} / ${symbols.length}`;
+        }
+
+        restartButton.addEventListener("click", startGame);
+        startGame();
+    </script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+
+<html>
+<body>
+<h2>Move the Box</h2>
+
+<div id="area" style="width:300px;height:300px;border:2px solid black;position:relative;">
+    <div id="box" style="width:30px;height:30px;background:red;position:absolute;left:0;top:0;"></div>
+    <div id="goal" style="width:30px;height:30px;background:green;position:absolute;left:260px;top:260px;"></div>
+</div>
+
+<p id="result"></p>
+
+<script>
+let box = document.getElementById("box");
+let x = 0, y = 0;
+
+document.addEventListener("keydown", function(e) {
+    switch(e.key.toLowerCase()) {
+        case "arrowup":
+        case "w":
+            if (y > 0) y -= 10;
+            break;
+
+        case "arrowdown":
+        case "s":
+            if (y < 260) y += 10;
+            break;
+
+        case "arrowleft":
+        case "a":
+            if (x > 0) x -= 10;
+            break;
+
+        case "arrowright":
+        case "d":
+            if (x < 260) x += 10;
+            break;
+    }
+
+    box.style.left = x + "px";
+    box.style.top = y + "px";
+
+    if (x === 260 && y === 260) {
+        document.getElementById("result").innerHTML = "You Win!";
+    }
+});
+</script>
+</body>
+</html>
